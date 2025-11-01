@@ -2,13 +2,18 @@ const express = require("express");
 const mongoose = require("mongoose");
 const nodemailer = require("nodemailer");
 const cors = require('cors');
-
+//import CryptoJS from 'crypto-js';
+const CryptoJS = require("crypto-js");
+require('dotenv').config();
 const app = express();
 const port=process.env.port || 3001;
+const macle=process.env.REACT_APP_MA_CLE;
+const decryptedData = CryptoJS.AES.decrypt("U2FsdGVkX19SatpJv8lbJNesf3wWuiOZPr+wnohKx6M=", macle).toString(CryptoJS.enc.Utf8);
+
 
 app.use(express.json());
 //Création de la connection à la base de données
-const connect=mongoose.connect("mongodb+srv://hamadiay:HAAY2024@mabase.izktzbl.mongodb.net/?retryWrites=true&w=majority&appName=maBase");
+const connect=mongoose.connect("mongodb+srv://hamadiay:"+decryptedData+"@mabase.izktzbl.mongodb.net/?retryWrites=true&w=majority&appName=maBase");
 
   connect.then(
     (db) => {
@@ -43,6 +48,7 @@ const ProductSchema = new mongoose.Schema({
   percsales: {type:Number,},
   taille: {type:String,},
   pointure: {type:Number,},
+  qtevendu: {type:Number,},
   ref: {type:String, required:true},
 });
 ProductSchema.set('versionKey', false);
@@ -101,6 +107,7 @@ app.patch("/updateprod", async (request, response) => {
     percsales: request.body.percsales,
     taille: request.body.taille,
     pointure: request.body.pointure,
+    qtevendu: request.body.qtevendu,
     ref: request.body.ref,
   };
     //console.log(request.body._id);
@@ -182,9 +189,9 @@ app.post("/ajouter", async (request, response) => {
     const message = req.body.message;
     //console.log(req.body);
     const mail = {
-      from: "Boutique LA COLLECTION",
+      from: "Boutique ESHOP",
       to: "hamadi.ay@gmail.com",
-      subject: "Contact Boutique Form LA COLLECTION: Code de confirmation d'inscription",
+      subject: "ESHOP contact Form: Code de confirmation d'inscription",
       html: `
               <p>Message: ${message}</p>
           `,
@@ -202,9 +209,9 @@ app.post("/ajouter", async (request, response) => {
     const email = req.body.email;
     const message = req.body.message;
     const mail = {
-      from: "Boutique LA COLLECTION",
+      from: "Boutique ESHOP",
       to: "hamadi.ay@gmail.com",
-      subject: "Contact Boutique Form LA COLLECTION: Code de validation récupération compte",
+      subject: "ESHOP contact Form: Code de validation récupération compte",
       html: `
               <p>Email: ${email}</p>
               <p>Message: ${message}</p>
@@ -225,8 +232,8 @@ app.post("/ajouter", async (request, response) => {
     const message = req.body.message;
     //console.log(req);
     const mail = {
-      from: "Boutique LA COLLECTION",
-      to: "hamadi.ay@gmail.com",
+      from: "ESHOP",
+      to: req.body.email,
       subject: req.body.objet,
       html: `
               <p>Email: ${email}</p>
@@ -377,5 +384,70 @@ app.delete("/supprimermessage/:_id", async (request, response) => {
   } catch (error) {
     console.log(error.message);
     response.status(500).json({ message: error.message });
+  }
+});
+
+//Gestion commandes
+const CommandeSchema = new mongoose.Schema({
+    _id: {type:String, required:false},
+    datacmd: {type:String, required:true},
+});
+CommandeSchema.set('versionKey', false);
+//user : c'est le nom du model
+const commande = mongoose.model('commandesLaCollection', CommandeSchema, 'commandesLaCollection');
+
+//Récupérer toutes les commandes
+
+app.get("/findallcmds", async (request, response) => {
+    //commande : c'est le nom du model
+      const cmds = await commande.find({});
+      //console.log(cmds);
+      try {
+        response.status(200).json(cmds);
+      } catch (error) {
+        //console.log(error.message);
+        response.status(500).json({ message: error.message });
+      }
+    });
+
+//Ajouter une commande
+
+app.post("/ajoutercmd", async (request, response) => {
+    const cmd = new commande(request.body);
+    try {
+      //console.log(request.body);
+      await cmd.save();
+      response.status(200).send();
+    } catch (error) {
+      response.status(500).send(error);
+      //console.log("COMMANDE: "+cmd);
+    }
+  });
+
+  //Supprimer une commande
+app.delete("/supprimercommande/:_id", async (request, response) => {
+  //modmessage : c'est le nom du model
+   await commande.findByIdAndDelete(request.params._id);
+  try {
+    response.status(200).send();
+  } catch (error) {
+    console.log(error.message);
+    response.status(500).json({ message: error.message });
+  }
+});
+
+//Mise à jour Commande 
+app.patch("/updatecommande", async (request, response) => {
+const newcmd ={
+  datacmd: request.body.datacmd,
+};
+  //console.log(request.body._id);
+  //console.log(newcmd);
+  try {
+    //admin : c'est le nom du model
+    await commande.findByIdAndUpdate(request.body._id, newcmd);
+    response.status(200).send(newcmd);
+  } catch (error) {
+    response.status(500).send(error);
   }
 });
