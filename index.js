@@ -190,7 +190,7 @@ app.post("/ajouter", async (request, response) => {
     //console.log(req.body);
     const mail = {
       from: "Boutique ESHOP",
-      to: "hamadi.ay@gmail.com",
+      to: email,
       subject: "ESHOP contact Form: Code de confirmation d'inscription",
       html: `
               <p>Message: ${message}</p>
@@ -210,7 +210,7 @@ app.post("/ajouter", async (request, response) => {
     const message = req.body.message;
     const mail = {
       from: "Boutique ESHOP",
-      to: "hamadi.ay@gmail.com",
+      to: email,
       subject: "ESHOP contact Form: Code de validation récupération compte",
       html: `
               <p>Email: ${email}</p>
