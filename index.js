@@ -166,21 +166,11 @@ app.post("/ajouter", async (request, response) => {
     }
   });
 
-  /*const contactEmail = nodemailer.createTransport({
+  const contactEmail = nodemailer.createTransport({
     service: "gmail",
     auth: {
       user: "hammadi.ayaridev@gmail.com",
       pass: process.env.REACT_APP_GOOGLE_APP_PASSWORD,
-    },
-    
-  });*/
-  const contactEmail = nodemailer.createTransport({
-    host: 'smtp.mailersend.net',
-    port: 587,
-    secure: false,
-    auth: {
-      user: 'MS_KGkBrJ@test-q3enl6kqpnm42vwr.mlsender.net',
-      pass: process.env.REACT_APP_MAILERSEND_APP_PASSWORD,
     },
     
   });
