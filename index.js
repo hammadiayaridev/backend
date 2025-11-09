@@ -167,14 +167,14 @@ app.post("/ajouter", async (request, response) => {
   });
 
   const contactEmail = nodemailer.createTransport({
-    service: "gmail",
+    service: process.env.REACT_APP_GOOGLE_APP_SERVICE,
     auth: {
-      user: "hammadi.ayaridev@gmail.com",
+      user: process.env.REACT_APP_GOOGLE_APP_USER,
       pass: process.env.REACT_APP_GOOGLE_APP_PASSWORD,
     },
     
   });
-  
+    
   contactEmail.verify((error) => {
     if (error) {
       console.log(error);
