@@ -166,22 +166,22 @@ app.post("/ajouter", async (request, response) => {
     }
   });
 
-  /*const contactEmail = nodemailer.createTransport({
+  const contactEmail = nodemailer.createTransport({
     service: process.env.REACT_APP_GOOGLE_APP_SERVICE,
     auth: {
       user: process.env.REACT_APP_GOOGLE_APP_USER,
       pass: process.env.REACT_APP_GOOGLE_APP_PASSWORD,
     },
     
-  });*/
-  const contactEmail = nodemailer.createTransport({
+  });
+  /*const contactEmail = nodemailer.createTransport({
     host: process.env.REACT_APP_MAILERSEND_APP_HOST,
     auth: {
       user: process.env.REACT_APP_MAILERSEND_APP_USER, // generated ethereal user
       pass: process.env.REACT_APP_MAILERSEND_APP_PASSWORD,
     },
     
-  });
+  });*/
   
   contactEmail.verify((error) => {
     if (error) {
@@ -196,22 +196,19 @@ app.post("/ajouter", async (request, response) => {
     const message = req.body.message;
     //console.log(req.body);
     const mail = {
-      //from: "Boutique ESHOP",
-      from: 'MS_KGkBrJ@test-q3enl6kqpnm42vwr.mlsender.net',
+      from: "Boutique ESHOP",
       to: email,
       subject: "ESHOP contact Form: Code de confirmation d'inscription",
-      /*html: `
+      html: `
               <p>Message: ${message}</p>
-          `,*/
-        text: "Message: "+message,
+          `,
+        /*text: "Message: "+message,*/
     };
     contactEmail.sendMail(mail, (error) => {
       if (error) {
         res.json({ status: "ERROR" });
-        console.log("ERROR")
       } else {
         res.json({ status: "Message Sent" });
-        console.log("Message Sent");
       }
     });
   });
